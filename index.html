@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đố Vui Hóa Học - Ester & Lipid</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+        background:
+            radial-gradient(circle at 20% 20%, #243b70 0, transparent 35%),
+            radial-gradient(circle at 80% 80%, #41245f 0, transparent 35%),
+            linear-gradient(135deg, #080b18, #11162b 50%, #090c18);
+        overflow: hidden;
+    }
+
+    .particles {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 0;
+    }
+
+    .particle {
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: rgba(100, 210, 255, 0.5);
+        box-shadow: 0 0 12px rgba(100, 210, 255, 0.8);
+        animation: float linear infinite;
+    }
+
+    @keyframes float {
+        from {
+            transform: translateY(110vh);
+            opacity: 0;
+        }
+        15% { opacity: 1; }
+        85% { opacity: 1; }
+        to {
+            transform: translateY(-10vh);
+            opacity: 0;
+        }
+    }
+
+    .game {
+        position: relative;
+        z-index: 1;
+        width: min(92vw, 850px);
+        max-height: 94vh;
+        padding: 30px;
+        border: 1px solid rgba(255,255,255,.12);
+        border-radius: 28px;
+        background: rgba(15, 20, 40, .78);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        box-shadow:
+            0 25px 80px rgba(0,0,0,.45),
+            inset 0 1px 0 rgba(255,255,255,.08);
+        overflow-y: auto;
+    }
+
+    header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .logo {
+        font-size: 42px;
+        margin-bottom: 7px;
+        filter: drop-shadow(0 0 15px rgba(80,210,255,.5));
+    }
+
+    h1 {
+        font-size: clamp(26px, 5vw, 40px);
+        letter-spacing: 1px;
+        background: linear-gradient(90deg, #69e7ff, #b78cff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+        color: #9ba8c7;
+        margin-top: 7px;
+        font-size: 14px;
+    }
+
+    .topbar {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .stat {
+        padding: 14px;
+        border-radius: 16px;
+        background: rgba(255,255,255,.055);
+        border: 1px solid rgba(255,255,255,.08);
+        text-align: center;
+    }
+
+    .stat-label {
+        display: block;
+        color: #8996b5;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+    }
+
+    .stat-value {
+        font-size: 23px;
+        font-weight: bold;
+    }
+
+    .timer-box {
+        margin-bottom: 24px;
+    }
+
+    .timer-header {
+        display: flex;
+        justify-content: space-between;
+        color: #aeb9d2;
+        font-size: 13px;
+        margin-bottom: 7px;
+    }
+
+    .timer-track {
+        width: 100%;
+        height: 8px;
+        background: rgba(255,255,255,.08);
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    #timerBar {
+        height: 100%;
+        width: 100%;
+        border-radius: 20px;
+        background: linear-gradient(90deg, #51e6ff, #7e8cff);
+        transition: width .1s linear, background .2s;
+    }
+
+    .question-card {
+        padding: 25px;
+        border-radius: 22px;
+        background: rgba(255,255,255,.055);
+        border: 1px solid rgba(255,255,255,.09);
+        margin-bottom: 18px;
+    }
+
+    .question-number {
+        color: #67dcff;
+        font-size: 13px;
+        font-weight: bold;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    #question {
+        font-size: clamp(19px, 3vw, 25px);
+        line-height: 1.55;
+        font-weight: 600;
+    }
+
+    .formula {
+        color: #8be8ff;
+        font-family: "Courier New", monospace;
+        white-space: nowrap;
+    }
+
+    .answers {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .answer {
+        position: relative;
+        min-height: 65px;
+        padding: 15px 17px;
+        text-align: left;
+        color: #eaf1ff;
+        background: rgba(255,255,255,.055);
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 16px;
+        cursor: pointer;
+        font-size: 15px;
+        line-height: 1.5;
+        transition:
+            transform .18s ease,
+            background .18s ease,
+            border-color .18s ease,
+            box-shadow .18s ease;
+    }
+
+    .answer:hover {
+        transform: translateY(-3px);
+        background: rgba(100,210,255,.1);
+        border-color: rgba(100,220,255,.45);
+        box-shadow: 0 8px 25px rgba(0,0,0,.2);
+    }
+
+    .answer:focus-visible {
+        outline: 2px solid #69e7ff;
+        outline-offset: 3px;
+    }
+
+    .key {
+        display: inline-flex;
+        width: 27px;
+        height: 27px;
+        justify-content: center;
+        align-items: center;
+        margin-right: 9px;
+        border-radius: 8px;
+        background: rgba(255,255,255,.1);
+        color: #8ceaff;
+        font-weight: bold;
+        flex-shrink: 0;
+    }
+
+    .answer.correct {
+        background: rgba(45, 220, 130, .18);
+        border-color: #35df91;
+        box-shadow: 0 0 25px rgba(45,220,130,.2);
+    }
+
+    .answer.wrong {
+        background: rgba(255, 75, 100, .18);
+        border-color: #ff5a72;
+        box-shadow: 0 0 25px rgba(255,75,100,.2);
+    }
+
+    .answer.disabled {
+        pointer-events: none;
+    }
+
+    .feedback {
+        min-height: 28px;
+        text-align: center;
+        font-weight: bold;
+        margin: 16px 0 4px;
+        font-size: 15px;
+    }
+
+    .feedback.good {
+        color: #54eea2;
+    }
+
+    .feedback.bad {
+        color: #ff7186;
+    }
+
+    .bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 18px;
+        color: #7f8baa;
+        font-size: 13px;
+        gap: 10px;
+    }
+
+    .restart-small {
+        border: 0;
+        background: transparent;
+        color: #70dfff;
+        cursor: pointer;
+        font-weight: bold;
+        padding: 6px 10px;
+        white-space: nowrap;
+    }
+
+    .restart-small:hover {
+        color: #fff;
+    }
+
+    .game-over {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 25px;
+        background: rgba(7,10,22,.88);
+        backdrop-filter: blur(10px);
+        border-radius: 28px;
+    }
+
+    .game-over.show {
+        display: flex;
+        animation: fadeIn .25s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .result {
+        width: min(90%, 470px);
+        text-align: center;
+        padding: 35px 25px;
+        border-radius: 25px;
+        background: linear-gradient(
+            145deg,
+            rgba(30,39,75,.95),
+            rgba(18,23,48,.95)
+        );
+        border: 1px solid rgba(255,255,255,.12);
+        box-shadow: 0 25px 70px rgba(0,0,0,.5);
+    }
+
+    .result-icon {
+        font-size: 58px;
+        margin-bottom: 10px;
+    }
+
+    .result h2 {
+        font-size: 30px;
+        margin-bottom: 15px;
+    }
+
+    .final-score {
+        font-size: 52px;
+        font-weight: 800;
+        background: linear-gradient(90deg, #67e8ff, #b88aff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 8px;
+    }
+
+    .result-info {
+        color: #9da8c3;
+        line-height: 1.7;
+        margin-bottom: 23px;
+    }
+
+    .restart {
+        border: 0;
+        padding: 14px 30px;
+        border-radius: 14px;
+        color: #07101c;
+        background: linear-gradient(90deg, #63e6ff, #9c8cff);
+        font-size: 16px;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 10px 30px rgba(100,190,255,.25);
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .restart:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 14px 35px rgba(100,190,255,.4);
+    }
+
+    @media (max-width: 650px) {
+        body {
+            align-items: flex-start;
+            padding: 15px 0;
+            overflow: auto;
+        }
+
+        .game {
+            padding: 20px 15px;
+            border-radius: 22px;
+            width: 95vw;
+        }
+
+        .answers {
+            grid-template-columns: 1fr;
+        }
+
+        .topbar {
+            gap: 7px;
+        }
+
+        .stat {
+            padding: 10px 5px;
+        }
+
+        .stat-value {
+            font-size: 19px;
+        }
+
+        .question-card {
+            padding: 19px;
+        }
+
+        .bottom {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: .01ms !important;
+            transition-duration: .01ms !important;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="particles" id="particles"></div>
+
+<main class="game">
+
+    <header>
+        <div class="logo">⚗️</div>
+
+        <h1>Đố Vui Hóa Học</h1>
+
+        <p class="subtitle">
+            Bài 1: Ester & Lipid • Hóa học 12 – Kết nối tri thức
+        </p>
+    </header>
+
+    <section class="topbar">
+
+        <div class="stat">
+            <span class="stat-label">Điểm</span>
+            <span class="stat-value" id="score">0</span>
+        </div>
+
+        <div class="stat">
+            <span class="stat-label">Câu hỏi</span>
+            <span class="stat-value">
+                <span id="current">1</span>/<span id="total">10</span>
+            </span>
+        </div>
+
+        <div class="stat">
+            <span class="stat-label">Combo</span>
+            <span class="stat-value">
+                🔥 <span id="combo">0</span>
+            </span>
+        </div>
+
+    </section>
+
+    <div class="timer-box">
+
+        <div class="timer-header">
+            <span>⏱ Thời gian</span>
+            <span id="timeText">15.0s</span>
+        </div>
+
+        <div class="timer-track">
+            <div id="timerBar"></div>
+        </div>
+
+    </div>
+
+    <section class="question-card">
+
+        <div class="question-number">
+            Câu <span id="questionNumber">1</span>
+        </div>
+
+        <div id="question">
+            Đang tải câu hỏi...
+        </div>
+
+    </section>
+
+    <section class="answers" id="answers"></section>
+
+    <div class="feedback" id="feedback"></div>
+
+    <div class="bottom">
+
+        <span>
+            ⌨ Phím 1–4 để chọn đáp án • Enter để tiếp tục
+        </span>
+
+        <button class="restart-small" onclick="restartGame()">
+            ↻ Chơi lại
+        </button>
+
+    </div>
+
+
+    <!-- MÀN HÌNH KẾT THÚC -->
+
+    <div class="game-over" id="gameOver">
+
+        <div class="result">
+
+            <div class="result-icon">🧪</div>
+
+            <h2>Hoàn thành!</h2>
+
+            <div class="final-score" id="finalScore">
+                0
+            </div>
+
+            <div class="result-info" id="resultInfo">
+                Bạn đã hoàn thành bài kiểm tra.
+            </div>
+
+            <button class="restart" onclick="restartGame()">
+                ↻ RESTART
+            </button>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<script>
+
+/* =========================================================
+   BỘ 10 CÂU HỎI
+   BÀI 1: ESTER & LIPID
+   HÓA HỌC 12 - KẾT NỐI TRI THỨC
+   ========================================================= */
+
+const questionBank = [
+
+    {
+        q: `Chất nào sau đây là ester?`,
+        a: [
+            `CH₃COOH`,
+            `CH₃CHO`,
+            `CH₃COOCH₃`,
+            `C₂H₅OH`
+        ],
+        correct: 2
+    },
+
+    {
+        q: `Tên gọi của ester HCOOCH₃ là`,
+        a: [
+            `methyl formate.`,
+            `ethyl formate.`,
+            `methyl acetate.`,
+            `ethyl acetate.`
+        ],
+        correct: 0
+    },
+
+    {
+        q: `Isoamyl acetate là ester có mùi thơm của chuối chín. Công thức cấu tạo của isoamyl acetate là`,
+        a: [
+            `CH₃COOCH₂CH₂CH(CH₃)₂`,
+            `HCOOCH₂CH₂CH(CH₃)₂`,
+            `CH₃COOCH₂CH(CH₃)₂`,
+            `C₂H₅COOCH₂CH₂CH(CH₃)₂`
+        ],
+        correct: 0
+    },
+
+    {
+        q: `Phản ứng thủy phân ester trong môi trường acid là phản ứng`,
+        a: [
+            `một chiều.`,
+            `thuận nghịch.`,
+            `trung hòa.`,
+            `tráng bạc.`
+        ],
+        correct: 1
+    },
+
+    {
+        q: `Sản phẩm thu được khi thủy phân methyl acetate (CH₃COOCH₃) trong dung dịch NaOH đun nóng là`,
+        a: [
+            `CH₃COOH và CH₃OH`,
+            `CH₃COONa và CH₃OH`,
+            `HCOONa và C₂H₅OH`,
+            `CH₃COONa và C₂H₅OH`
+        ],
+        correct: 1
+    },
+
+    {
+        q: `Chất nào sau đây là triester của glycerol với các acid béo (lipid/triglyceride)?`,
+        a: [
+            `Triolein.`,
+            `Glucose.`,
+            `Ethyl acetate.`,
+            `Ethanol.`
+        ],
+        correct: 0
+    },
+
+    {
+        q: `Chất béo nhẹ hơn nước và có tính chất nào sau đây?`,
+        a: [
+            `Tan tốt trong nước.`,
+            `Không tan trong nước, tan nhiều trong dung môi hữu cơ.`,
+            `Tan tốt trong dung dịch muối ăn.`,
+            `Tan hoàn toàn trong nước lạnh.`
+        ],
+        correct: 1
+    },
+
+    {
+        q: `Đun nóng chất béo trong dung dịch NaOH thu được sản phẩm gồm muối của acid béo và chất nào sau đây?`,
+        a: [
+            `Ethanol.`,
+            `Glycerol.`,
+            `Acetic acid.`,
+            `Methanol.`
+        ],
+        correct: 1
+    },
+
+    {
+        q: `Phản ứng thủy phân chất béo trong môi trường kiềm (NaOH hoặc KOH) còn được gọi là phản ứng`,
+        a: [
+            `ester hóa.`,
+            `xà phòng hóa.`,
+            `tráng bạc.`,
+            `hydrogen hóa.`
+        ],
+        correct: 1
+    },
+
+    {
+        q: `Chất nào sau đây thuộc loại acid béo no thường có trong mỡ động vật?`,
+        a: [
+            `Oleic acid.`,
+            `Stearic acid.`,
+            `Linoleic acid.`,
+            `Acetic acid.`
+        ],
+        correct: 1
+    }
+
+];
+
+
+/* =========================================================
+   CÀI ĐẶT GAME
+   ========================================================= */
+
+const QUESTIONS_PER_GAME = 10;
+const TIME_LIMIT = 15;
+
+let questions = [];
+let questionIndex = 0;
+let score = 0;
+let combo = 0;
+let correctCount = 0;
+let timeLeft = TIME_LIMIT;
+let timer = null;
+let answered = false;
+let waitingNext = false;
+
+
+/* =========================================================
+   DOM
+   ========================================================= */
+
+const questionEl =
+    document.getElementById("question");
+
+const answersEl =
+    document.getElementById("answers");
+
+const scoreEl =
+    document.getElementById("score");
+
+const comboEl =
+    document.getElementById("combo");
+
+const currentEl =
+    document.getElementById("current");
+
+const totalEl =
+    document.getElementById("total");
+
+const questionNumberEl =
+    document.getElementById("questionNumber");
+
+const timerBar =
+    document.getElementById("timerBar");
+
+const timeText =
+    document.getElementById("timeText");
+
+const feedbackEl =
+    document.getElementById("feedback");
+
+const gameOverEl =
+    document.getElementById("gameOver");
+
+const finalScoreEl =
+    document.getElementById("finalScore");
+
+const resultInfoEl =
+    document.getElementById("resultInfo");
+
+
+/* =========================================================
+   XÁO TRỘN
+   ========================================================= */
+
+function shuffle(array) {
+
+    return [...array].sort(
+        () => Math.random() - 0.5
+    );
+
+}
+
+
+/* =========================================================
+   BẮT ĐẦU / CHƠI LẠI
+   ========================================================= */
+
+function restartGame() {
+
+    clearInterval(timer);
+
+    /*
+       Các câu hỏi vẫn giữ nguyên nội dung.
+       Thứ tự câu hỏi được xáo trộn mỗi lần chơi.
+    */
+
+    questions = shuffle(questionBank)
+        .slice(
+            0,
+            Math.min(
+                QUESTIONS_PER_GAME,
+                questionBank.length
+            )
+        );
+
+    questionIndex = 0;
+
+    score = 0;
+
+    combo = 0;
+
+    correctCount = 0;
+
+    answered = false;
+
+    waitingNext = false;
+
+    scoreEl.textContent = "0";
+
+    comboEl.textContent = "0";
+
+    gameOverEl.classList.remove("show");
+
+    loadQuestion();
+
+}
+
+
+/* =========================================================
+   HIỂN THỊ CÂU HỎI
+   ========================================================= */
+
+function loadQuestion() {
+
+    clearInterval(timer);
+
+    if (questionIndex >= questions.length) {
+
+        endGame();
+
+        return;
+
+    }
+
+    const item =
+        questions[questionIndex];
+
+    answered = false;
+
+    waitingNext = false;
+
+    currentEl.textContent =
+        questionIndex + 1;
+
+    questionNumberEl.textContent =
+        questionIndex + 1;
+
+
+    questionEl.textContent =
+        item.q;
+
+
+    answersEl.innerHTML = "";
+
+
+    item.a.forEach(
+        (answer, index) => {
+
+            const button =
+                document.createElement("button");
+
+            button.className = "answer";
+
+            button.dataset.index =
+                index;
+
+            button.innerHTML = `
+                <span class="key">
+                    ${index + 1}
+                </span>
+                ${answer}
+            `;
+
+            button.addEventListener(
+                "click",
+                () => selectAnswer(index)
+            );
+
+            answersEl.appendChild(button);
+
+        }
+    );
+
+
+    feedbackEl.textContent = "";
+
+    feedbackEl.className =
+        "feedback";
+
+
+    startTimer();
+
+}
+
+
+/* =========================================================
+   BỘ ĐẾM THỜI GIAN
+   ========================================================= */
+
+function startTimer() {
+
+    timeLeft = TIME_LIMIT;
+
+    updateTimer();
+
+    const start =
+        performance.now();
+
+    timer = setInterval(
+        () => {
+
+            const elapsed =
+                (performance.now() - start)
+                / 1000;
+
+            timeLeft =
+                Math.max(
+                    0,
+                    TIME_LIMIT - elapsed
+                );
+
+            updateTimer();
+
+            if (timeLeft <= 0) {
+
+                clearInterval(timer);
+
+                timeOut();
+
+            }
+
+        },
+        50
+    );
+
+}
+
+
+function updateTimer() {
+
+    const percent =
+        Math.max(
+            0,
+            timeLeft / TIME_LIMIT * 100
+        );
+
+
+    timerBar.style.width =
+        percent + "%";
+
+
+    timeText.textContent =
+        timeLeft.toFixed(1) + "s";
+
+
+    if (percent <= 30) {
+
+        timerBar.style.background =
+            "linear-gradient(90deg, #ff4f68, #ff9270)";
+
+    }
+
+    else if (percent <= 60) {
+
+        timerBar.style.background =
+            "linear-gradient(90deg, #ffc65b, #ff8f6b)";
+
+    }
+
+    else {
+
+        timerBar.style.background =
+            "linear-gradient(90deg, #51e6ff, #7e8cff)";
+
+    }
+
+}
+
+
+/* =========================================================
+   XỬ LÝ ĐÁP ÁN
+   ========================================================= */
+
+function selectAnswer(index) {
+
+    if (
+        answered ||
+        waitingNext
+    ) return;
+
+
+    answered = true;
+
+    clearInterval(timer);
+
+
+    const item =
+        questions[questionIndex];
+
+
+    const buttons =
+        document.querySelectorAll(".answer");
+
+
+    buttons.forEach(
+        button => {
+
+            button.classList.add(
+                "disabled"
+            );
+
+        }
+    );
+
+
+    buttons[item.correct]
+        .classList.add("correct");
+
+
+    if (index === item.correct) {
+
+        combo++;
+
+        correctCount++;
+
+
+        /*
+           Điểm:
+           - 100 điểm cơ bản
+           - Thưởng tốc độ
+           - Thưởng combo
+        */
+
+        const speedBonus =
+            Math.ceil(timeLeft * 2);
+
+        const comboBonus =
+            Math.max(
+                0,
+                (combo - 1) * 5
+            );
+
+
+        const gained =
+            100 +
+            speedBonus +
+            comboBonus;
+
+
+        score += gained;
+
+
+        scoreEl.textContent =
+            score;
+
+        comboEl.textContent =
+            combo;
+
+
+        feedbackEl.textContent =
+            `✓ Chính xác! +${gained} điểm`;
+
+        feedbackEl.className =
+            "feedback good";
+
+    }
+
+    else {
+
+        buttons[index]
+            .classList.add("wrong");
+
+
+        combo = 0;
+
+        comboEl.textContent =
+            "0";
+
+
+        feedbackEl.textContent =
+            "✕ Chưa chính xác!";
+
+        feedbackEl.className =
+            "feedback bad";
+
+    }
+
+
+    waitingNext = true;
+
+
+    setTimeout(
+        () => {
+
+            nextQuestion();
+
+        },
+        1100
+    );
+
+}
+
+
+/* =========================================================
+   HẾT THỜI GIAN
+   ========================================================= */
+
+function timeOut() {
+
+    if (answered) return;
+
+
+    answered = true;
+
+
+    const item =
+        questions[questionIndex];
+
+
+    const buttons =
+        document.querySelectorAll(".answer");
+
+
+    buttons.forEach(
+        button => {
+
+            button.classList.add(
+                "disabled"
+            );
+
+        }
+    );
+
+
+    buttons[item.correct]
+        .classList.add("correct");
+
+
+    combo = 0;
+
+    comboEl.textContent =
+        "0";
+
+
+    feedbackEl.textContent =
+        "⏰ Hết giờ!";
+
+    feedbackEl.className =
+        "feedback bad";
+
+
+    waitingNext = true;
+
+
+    setTimeout(
+        () => {
+
+            nextQuestion();
+
+        },
+        1100
+    );
+
+}
+
+
+/* =========================================================
+   CÂU TIẾP THEO
+   ========================================================= */
+
+function nextQuestion() {
+
+    questionIndex++;
+
+
+    if (
+        questionIndex >=
+        questions.length
+    ) {
+
+        endGame();
+
+    }
+
+    else {
+
+        loadQuestion();
+
+    }
+
+}
+
+
+/* =========================================================
+   KẾT THÚC GAME
+   ========================================================= */
+
+function endGame() {
+
+    clearInterval(timer);
+
+
+    const percentage =
+        Math.round(
+            correctCount /
+            questions.length *
+            100
+        );
+
+
+    let message;
+
+
+    if (percentage === 100) {
+
+        message =
+            "🏆 Xuất sắc! Bạn đã trả lời đúng toàn bộ câu hỏi.";
+
+    }
+
+    else if (percentage >= 80) {
+
+        message =
+            "🌟 Rất tốt! Bạn nắm khá chắc kiến thức Ester & Lipid.";
+
+    }
+
+    else if (percentage >= 60) {
+
+        message =
+            "👍 Khá tốt! Hãy tiếp tục ôn tập để củng cố kiến thức.";
+
+    }
+
+    else if (percentage >= 40) {
+
+        message =
+            "📚 Hãy xem lại kiến thức cơ bản về Ester & Lipid và thử lại.";
+
+    }
+
+    else {
+
+        message =
+            "🧪 Đừng bỏ cuộc! Hãy ôn lại bài và thử sức lần nữa.";
+
+    }
+
+
+    finalScoreEl.textContent =
+        score;
+
+
+    resultInfoEl.innerHTML = `
+        Bạn trả lời đúng
+        <strong>
+            ${correctCount}/${questions.length}
+        </strong>
+        câu
+        (${percentage}%).
+        <br><br>
+        ${message}
+    `;
+
+
+    gameOverEl.classList.add(
+        "show"
+    );
+
+}
+
+
+/* =========================================================
+   ĐIỀU KHIỂN BÀN PHÍM
+   ========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        /*
+           Phím 1–4:
+           Chọn đáp án
+        */
+
+        if (/^[1-4]$/.test(event.key)) {
+
+            const index =
+                Number(event.key) - 1;
+
+
+            if (
+                !answered &&
+                !waitingNext
+            ) {
+
+                selectAnswer(index);
+
+            }
+
+            return;
+
+        }
+
+
+        /*
+           Enter:
+           - Nếu game kết thúc -> chơi lại
+           - Nếu đã trả lời -> sang câu tiếp
+        */
+
+        if (event.key === "Enter") {
+
+            if (
+                gameOverEl
+                    .classList
+                    .contains("show")
+            ) {
+
+                restartGame();
+
+                return;
+
+            }
+
+
+            if (waitingNext) {
+
+                clearTimeout();
+
+                nextQuestion();
+
+            }
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   TẠO HẠT NỀN
+   ========================================================= */
+
+function createParticles() {
+
+    const container =
+        document.getElementById(
+            "particles"
+        );
+
+
+    for (
+        let i = 0;
+        i < 35;
+        i++
+    ) {
+
+        const p =
+            document.createElement("div");
+
+
+        p.className =
+            "particle";
+
+
+        p.style.left =
+            Math.random() * 100 + "%";
+
+
+        p.style.animationDuration =
+            (
+                7 +
+                Math.random() * 12
+            ) + "s";
+
+
+        p.style.animationDelay =
+            (
+                -Math.random() * 15
+            ) + "s";
+
+
+        const size =
+            2 +
+            Math.random() * 4;
+
+
+        p.style.width =
+            size + "px";
+
+        p.style.height =
+            size + "px";
+
+
+        container.appendChild(p);
+
+    }
+
+}
+
+
+/* =========================================================
+   KHỞI ĐỘNG
+   ========================================================= */
+
+createParticles();
+
+totalEl.textContent =
+    questionBank.length;
+
+restartGame();
+
+</script>
+
+</body>
+</html>
